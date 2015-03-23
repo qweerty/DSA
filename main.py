@@ -123,7 +123,6 @@ class FunctionEvaluation(ReversePolishNotation):
 							print("Value Error, please try again.")
 							
 					'''Add to string from the Database 
-					############## TEST ###############
 					'''
 					database().addVarAndValueToDB(self.newString[i],
 						self.Value)
@@ -152,11 +151,11 @@ class FunctionEvaluation(ReversePolishNotation):
 		return self.RESULT
 
 
-	def getValueFromConsole(self, a):
+	def getValueFromConsole(self, var):
 		'''Returnes Value of the Variable which is passed to this
 		function
 		'''
-		self.Value = input("%s not consists in DB, please enter its Value: " % a)
+		self.Value = input("%s not consists in DB, please enter its Value: " % var)
 		return self.Value
 
 
@@ -189,19 +188,23 @@ class database:
 		'''
 		os.mkdir(self.PATH+"\\DB")
 
+	def connectToDB(self):
+		'''Function realize connection to database
+		'''
+		self.con = sqlite3.connect(self.PATH+"\\DB\\"+"VSSTD.db")
+		self.cur = self.con.cursor()
+
 
 	def inputFirstVars(self):
 		'''If database Not created user have to enter at least one Variable
 		with its Value
 		'''
-		self.con = sqlite3.connect(self.PATH+"\\DB\\"+"VSSTD.db")
-		self.cur = self.con.cursor()
-		self.newVSSTD = input("""Please, enter at least ONE Variable like: 
-			"$A.EM=25.4;": """)
+		self.connectToDB()
+		self.newVSSTD = input("Please, enter at least ONE Variable" +
+			" like: '$A.EM=25.4;': ")
 
 		self.newDictForDB = VSSTD().parse(self.newVSSTD)
-		self.con = sqlite3.connect(self.PATH+"\\DB\\"+"VSSTD.db")
-		self.cur = self.con.cursor()
+		self.connectToDB()
 		for currKey in self.newDictForDB:
 			self.cur.execute("INSERT INTO vsstd VALUES('%s', '%s')" %
 				(currKey, self.newDictForDB.get(currKey)))
@@ -212,13 +215,11 @@ class database:
 		'''Creating database for work
 		'''
 		if os.path.exists(self.PATH+"\\DB") == True:
-			self.con = sqlite3.connect(self.PATH+"\\DB\\"+"VSSTD.db")
-			self.cur = self.con.cursor()
+			self.connectToDB()
 			self.con.commit()
 		else:
 			self.createDirForDB()
-			self.con = sqlite3.connect(self.PATH+"\\DB\\"+"VSSTD.db")
-			self.cur = self.con.cursor()
+			self.connectToDB()
 			self.cur.execute("CREATE TABLE vsstd (Var TEXT, Value TEXT)")
 			self.inputFirstVars()
 			self.con.commit()
@@ -228,8 +229,7 @@ class database:
 		'''Function changes data of DB as adding it and its value to Database
 		which get from the console.
 		'''
-		self.con = sqlite3.connect(self.PATH+"\\DB\\"+"VSSTD.db")
-		self.cur = self.con.cursor()
+		self.connectToDB()
 		self.cur.execute("INSERT INTO vsstd VALUES('%s', '%s')" % (str(var), str(value)))
 		self.con.commit()
 		print(var,"=",value, " added to database")
@@ -238,8 +238,7 @@ class database:
 	def checkVarDB(self, var):
 		'''Function returned the string representation of the Var
 		'''
-		self.con = sqlite3.connect(self.PATH+"\\DB\\"+"VSSTD.db")
-		self.cur = self.con.cursor()
+		self.connectToDB()
 		self.count = self.cur.execute("SELECT COUNT (*) AS 'count' FROM vsstd WHERE Var = '%s'" % var).fetchall()[0][0]
 		self.con.commit()
 
@@ -249,8 +248,7 @@ class database:
 	def getValueOfVarDB(self, var):
 		'''Function returned Value's string representation of the Var
 		'''
-		self.con = sqlite3.connect(self.PATH+"\\DB\\"+"VSSTD.db")
-		self.cur = self.con.cursor()
+		self.connectToDB()
 		return self.cur.execute("SELECT * FROM vsstd WHERE Var = '%s'" % var).fetchall()[0][1]
 
 
