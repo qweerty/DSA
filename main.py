@@ -1,7 +1,7 @@
 # -*-coding: utf-8 -*-
 import os
 #import re
-import sqlite3
+import sqlite3 as S3
 
 
 
@@ -198,7 +198,7 @@ class database:
 	def connectToDB(self):
 		'''Function realize connection to database
 		'''
-		self.con = sqlite3.connect(self.PATH+"\\DB\\"+"VSSTD.db")
+		self.con = S3.connect(self.PATH+"\\DB\\"+"VSSTD.db")
 		self.cur = self.con.cursor()
 
 
