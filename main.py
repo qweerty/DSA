@@ -85,6 +85,13 @@ class FunctionEvaluation(ReversePolishNotation):
 	RESULT = 0
 	LENGTH = len(STACK)
 
+	MATH_ELEMENTS = ["+", "-", "*", "/", "(", ")"]
+
+
+	def isOperand(self, element):
+		return element in self.MATH_ELEMENTS
+
+
 	def equal(self, givven_string):
 		'''Function replace the variable by its value from the database. 
 		'''
@@ -99,15 +106,15 @@ class FunctionEvaluation(ReversePolishNotation):
 			else:
 				'''Else...
 				'''
-				if (self.newString[i] not in ["+", "-", "*", "/", "(", ")"]
-					) and database().checkVarDB(self.newString[i]) != 0:
+				if not self.isOperand(self.newString[i]) and (
+					database().checkVarDB(self.newString[i]) != 0):
 
 					'''If element exists in the database, then just replace 
 					by its value from the database.
 					'''
 					self.newString[i] = database().getValueOfVarDB(self.newString[i])
-				elif (self.newString[i] not in ["+", "-", "*", "/", "(", ")"]
-					) and (database().checkVarDB(self.newString[i]) == 0):
+				elif not self.isOperand(self.newString[i]) and (
+					database().checkVarDB(self.newString[i]) == 0):
 
 					'''If element not exists in the database, then 
 					enter the value of it and put to the database and at the 
